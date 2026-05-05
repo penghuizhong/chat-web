@@ -1,4 +1,10 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001"
+const isServer = typeof window === "undefined"
+
+// 客户端使用相对路径（触发 Nginx 网关同源转发）
+// 服务端使用 Docker 容器名直连（内网光速通信）
+const API_BASE_URL = isServer
+  ? (process.env.INTERNAL_AI_SERVER_URL || "http://ai_server:8001")
+  : ""
 
 // 全局 401 处理器，由 AuthProvider 注册
 let globalUnauthorizedHandler: (() => void) | null = null

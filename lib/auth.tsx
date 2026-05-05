@@ -2,23 +2,16 @@
 
 import { SessionProvider, useSession, signIn, signOut } from "next-auth/react"
 import type { Session } from "next-auth"
-// 👉 1. 记得引入 useState
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
-import { apiClient, setUnauthorizedHandler } from "@/lib/api"
+import { apiClient, setUnauthorizedHandler } from "@/lib/api" // 替换为您实际的路径
 import { toast } from "sonner"
 
 interface AuthContextType {
-  user: {
-    id?: string
-    name?: string | null
-    email?: string | null
-    image?: string | null
-  } | null
+  user: Session["user"] | null
   isAuthenticated: boolean
   isLoading: boolean
   login: () => Promise<void>
   logout: () => Promise<void>
-  // 👉 2. 增加弹窗相关的类型定义
   isAuthModalOpen: boolean
   showAuthModal: () => void
   hideAuthModal: () => void
@@ -29,46 +22,49 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 function AuthProviderContent({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession()
 
-  // 👉 3. 增加弹窗的 State
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const showAuthModal = () => setIsAuthModalOpen(true)
   const hideAuthModal = () => setIsAuthModalOpen(false)
 
-  // accessToken 同步到 apiClient
+  // 👉 优化点 1：安全地向 ApiClient 单例注入 Token
   useEffect(() => {
-    if (session?.accessToken) {
+    // 只有状态明确为 authenticated 时才注入，防止 loading 态清空 Token
+    if (status === "authenticated" && session?.accessToken) {
       apiClient.setToken(session.accessToken)
-    } else {
+    } else if (status === "unauthenticated") {
       apiClient.clearToken()
     }
-  }, [session?.accessToken])
+  }, [session?.accessToken, status])
 
-  // 👉 4. 修改 401 拦截逻辑：不再强行 signOut 跳转，而是清空 token 并弹窗提醒
+  // 👉 优化点 2：完善 401 拦截逻辑
   useEffect(() => {
     setUnauthorizedHandler(() => {
-      console.error("触发了 401 拦截！")
+      console.warn("[Auth] 触发了 401 拦截，清空凭证并唤起登录")
       apiClient.clearToken()
       toast.error("登录状态已过期，请重新登录")
-      showAuthModal() // 弹出你定制的 AuthModal
+      showAuthModal()
     })
+
+    // 清理函数，防止组件卸载时内存泄漏
     return () => setUnauthorizedHandler(null)
-  }, [])
+  }, []) // 空依赖数组，因为 setIsAuthModalOpen 是稳定的
 
   const isLoading = status === "loading"
   const isAuthenticated = status === "authenticated"
   const user = session?.user ?? null
 
   const login = async () => {
-    await signIn("casdoor")
+    // 👉 优化点 3：记录当前路径，登录后无缝跳回（极大提升 UX）
+    const callbackUrl = typeof window !== "undefined" ? window.location.pathname + window.location.search : "/"
+    await signIn("casdoor", { redirectTo: callbackUrl }) // v5 推荐使用 redirectTo 代替 callbackUrl 参数
   }
 
   const logout = async () => {
     apiClient.clearToken()
-    await signOut({ callbackUrl: "/" })
+    await signOut({ redirectTo: "/" })
   }
 
   return (
-    // 👉 5. 将弹窗状态和方法暴露出去
     <AuthContext.Provider value={{
       user, isAuthenticated, isLoading, login, logout,
       isAuthModalOpen, showAuthModal, hideAuthModal
@@ -80,6 +76,7 @@ function AuthProviderContent({ children }: { children: ReactNode }) {
 
 export function AuthProvider({ children, session }: { children: ReactNode; session: Session | null }) {
   return (
+    // 接收服务端传来的 session 初始值，避免客户端初次加载时的闪烁
     <SessionProvider session={session}>
       <AuthProviderContent>{children}</AuthProviderContent>
     </SessionProvider>
@@ -89,7 +86,7 @@ export function AuthProvider({ children, session }: { children: ReactNode; sessi
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth 必须包裹在 AuthProvider 内部使用")
   }
   return context
 }
