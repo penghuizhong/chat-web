@@ -1,0 +1,14 @@
+version: '3'
+services:
+  fyzj-web:
+    image: zhongpenghui/fyzj-web-arm64:v1.0
+    container_name: fyzj-web
+    restart: always
+    env_file: [ .env ]
+    ports:
+      - "3000:3000" # 移除 127.0.0.1 限制，让 Nginx 可以访问
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
