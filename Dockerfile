@@ -30,6 +30,7 @@ RUN apk add --no-cache libc6-compat
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV CASDOOR_INTERNAL_URL=http://casdoor:8000
 ENV HOSTNAME=0.0.0.0
 # [填坑3] 显式声明端口，确保 server.js 准确绑定
 ENV PORT=3000
