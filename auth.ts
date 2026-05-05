@@ -10,8 +10,8 @@ const config: NextAuthConfig = {
             clientId: process.env.CASDOOR_CLIENT_ID!,
             clientSecret: process.env.CASDOOR_CLIENT_SECRET!,
             issuer: process.env.CASDOOR_ISSUER!,
-            // 核心 2：有了 type="oidc" 和 issuer，千万别再写 authorization/token/userinfo 网址！
-            // NextAuth 会自动请求 https://auth.fyzj.online/.well-known/openid-configuration 获取所有端点
+
+            checks: ["pkce", "state"],
 
             // 核心 3：对 Casdoor 返回的用户信息做兼容解析，防止报 502
             profile(profile) {
