@@ -2,13 +2,7 @@
 import NextAuth from "next-auth"
 import type { NextAuthConfig } from "next-auth"
 
-function requireEnv(key: string): string {
-    const value = process.env[key]
-    if (!value) throw new Error(`[next-auth] 缺少必要环境变量: ${key}`)
-    return value
-}
-
-const baseUrl = requireEnv("CASDOOR_INTERNAL_URL").replace(/\/$/, "")
+const baseUrl = (process.env.CASDOOR_INTERNAL_URL || "").replace(/\/$/, "")
 
 const config: NextAuthConfig = {
     debug: process.env.NODE_ENV === "development",
@@ -18,9 +12,9 @@ const config: NextAuthConfig = {
             id: "casdoor",
             name: "Casdoor",
             type: "oidc",
-            clientId: requireEnv("CASDOOR_CLIENT_ID"),
-            clientSecret: requireEnv("CASDOOR_CLIENT_SECRET"),
-            issuer: requireEnv("CASDOOR_ISSUER"),
+            clientId: process.env.CASDOOR_CLIENT_ID!,
+            clientSecret: process.env.CASDOOR_CLIENT_SECRET!,
+            issuer: process.env.CASDOOR_ISSUER!,
 
             // ✅ 内网加速：服务端请求全走内网
             wellKnown: `${baseUrl}/.well-known/openid-configuration`,

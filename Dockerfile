@@ -18,7 +18,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # [填坑1] 接收构建参数，并作为环境变量传递给 build 进程
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV CASDOOR_INTERNAL_URL=http://casdoor:8000
 
 RUN pnpm build
 
@@ -31,7 +30,6 @@ RUN apk add --no-cache libc6-compat
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV CASDOOR_INTERNAL_URL=http://casdoor:8000
 ENV HOSTNAME=0.0.0.0
 # [填坑3] 显式声明端口，确保 server.js 准确绑定
 ENV PORT=3000
