@@ -1,56 +1,64 @@
+// /src/auth.ts
 import NextAuth from "next-auth"
 import type { NextAuthConfig } from "next-auth"
 
+function requireEnv(key: string): string {
+    const value = process.env[key]
+    if (!value) throw new Error(`[next-auth] 缺少必要环境变量: ${key}`)
+    return value
+}
+
+const baseUrl = requireEnv("CASDOOR_INTERNAL_URL").replace(/\/$/, "")
+
 const config: NextAuthConfig = {
     debug: process.env.NODE_ENV === "development",
+
     providers: [
         {
             id: "casdoor",
             name: "Casdoor",
-            type: "oidc", // 核心 1：指定为标准的 oidc 类型
-            clientId: process.env.CASDOOR_CLIENT_ID!,
-            clientSecret: process.env.CASDOOR_CLIENT_SECRET!,
-            issuer: process.env.CASDOOR_ISSUER!,
+            type: "oidc",
+            clientId: requireEnv("CASDOOR_CLIENT_ID"),
+            clientSecret: requireEnv("CASDOOR_CLIENT_SECRET"),
+            issuer: requireEnv("CASDOOR_ISSUER"),
+
+            // ✅ 内网加速：服务端请求全走内网
+            wellKnown: `${baseUrl}/.well-known/openid-configuration`,
+            token: `${baseUrl}/api/login/oauth/access_token`,
+            userinfo: `${baseUrl}/api/userinfo`,
 
             checks: ["pkce", "state"],
 
-            // 核心 3：对 Casdoor 返回的用户信息做兼容解析，防止报 502
+            // ✅ 来自这份代码的亮点：兼容 Casdoor 非标准字段
             profile(profile) {
                 return {
-                    // 优先取 sub，如果没有则取 id，绝对不能返回 undefined
-                    id: profile.sub || profile.id,
-                    name: profile.name || profile.preferred_username || profile.displayName,
+                    id: profile.sub ?? profile.id,
+                    name: profile.name ?? profile.preferred_username ?? profile.displayName,
                     email: profile.email,
-                    image: profile.picture || profile.avatar,
+                    image: profile.picture ?? profile.avatar,
                 }
             },
         },
     ],
+
     callbacks: {
-        async jwt({ token, account, profile }) {
-            // account 只在首次登录回调时存在
+        jwt({ token, account }) {
             if (account) {
                 token.accessToken = account.access_token
+                // ✅ expiresAt 保留但后续要用，否则删掉
                 token.expiresAt = account.expires_at
-            }
-            // 兼容 sub 字段获取
-            if (profile) {
-                token.sub = profile.sub || profile.id || token.sub
             }
             return token
         },
-        async session({ session, token }) {
-            session.accessToken = token.accessToken as string
-            session.user.id = token.sub as string
+        session({ session, token }) {
+            // ✅ 类型安全来自 next-auth.d.ts，无需断言
+            if (token.accessToken) session.accessToken = token.accessToken
+            if (token.sub) session.user.id = token.sub
             return session
         },
     },
-    pages: {
-        signIn: "/",
-    },
-    session: {
-        strategy: "jwt",
-    },
+
+    pages: { signIn: "/" },
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config)
