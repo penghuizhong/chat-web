@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import type { NextAuthConfig } from "next-auth"
 
 const config: NextAuthConfig = {
-    debug: true,
+    debug: process.env.NODE_ENV === "development",
     providers: [
         {
             id: "casdoor",
