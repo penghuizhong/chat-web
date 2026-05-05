@@ -32,4 +32,5 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/fyzj-web:v1.${{ github.run_number }}
           # 💡 如果您的前端打包需要 API 地址，可以在这里传入参数
           build-args: |
-            NEXT_PUBLIC_API_URL=https://api.fyzj.online
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_CASDOOR_URL=${{ vars.NEXT_PUBLIC_CASDOOR_URL }}

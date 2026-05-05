@@ -6,40 +6,35 @@ const config: NextAuthConfig = {
         {
             id: "casdoor",
             name: "Casdoor",
-            type: "oauth",
+            type: "oidc", // 核心 1：指定为标准的 oidc 类型
             clientId: process.env.CASDOOR_CLIENT_ID!,
             clientSecret: process.env.CASDOOR_CLIENT_SECRET!,
             issuer: process.env.CASDOOR_ISSUER!,
-            authorization: {
-                url: `${process.env.CASDOOR_ISSUER}/login/oauth/authorize`,
-                params: { scope: "openid profile email" },
-            },
-            token: {
-                url: `${process.env.CASDOOR_ISSUER}/api/login/oauth/access_token`,
-            },
-            userinfo: {
-                url: `${process.env.CASDOOR_ISSUER}/api/get-account`,
-            },
-            checks: ["pkce", "state"],
-            profile(profile: any) {
+            // 核心 2：有了 type="oidc" 和 issuer，千万别再写 authorization/token/userinfo 网址！
+            // NextAuth 会自动请求 https://auth.fyzj.online/.well-known/openid-configuration 获取所有端点
+
+            // 核心 3：对 Casdoor 返回的用户信息做兼容解析，防止报 502
+            profile(profile) {
                 return {
-                    id: profile.sub,
-                    name: profile.name || profile.preferred_username,
+                    // 优先取 sub，如果没有则取 id，绝对不能返回 undefined
+                    id: profile.sub || profile.id,
+                    name: profile.name || profile.preferred_username || profile.displayName,
                     email: profile.email,
-                    image: profile.picture,
+                    image: profile.picture || profile.avatar,
                 }
             },
         },
     ],
     callbacks: {
         async jwt({ token, account, profile }) {
-            // account 只在首次登录回调时存在，存入 accessToken
+            // account 只在首次登录回调时存在
             if (account) {
                 token.accessToken = account.access_token
                 token.expiresAt = account.expires_at
             }
+            // 兼容 sub 字段获取
             if (profile) {
-                token.sub = profile.sub ?? undefined
+                token.sub = profile.sub || profile.id || token.sub
             }
             return token
         },

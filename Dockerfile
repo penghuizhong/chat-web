@@ -1,7 +1,7 @@
 # 第一阶段：编译 (Build Stage)
 FROM node:20-alpine AS builder
 
-# [优化项] 安装必要的系统底层库，防止 Next.js 的 SWC 编译器崩溃
+# [填坑2] 安装必要的系统底层库，防止 Next.js 编译器崩溃
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -12,11 +12,14 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-# [优化项] 关闭 Vercel 遥测，加快构建速度
+# 关闭 Vercel 遥测，加快构建速度
 ENV NEXT_TELEMETRY_DISABLED=1
-# 注入前端构建期需要的公开环境变量
-ENV NEXT_PUBLIC_API_URL="https://api.fyzj.online"
-ENV NEXT_PUBLIC_CASDOOR_URL="https://auth.fyzj.online"
+
+# [填坑1] 接收构建参数，并作为环境变量传递给 build 进程
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_CASDOOR_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_CASDOOR_URL=$NEXT_PUBLIC_CASDOOR_URL
 
 RUN pnpm build
 
@@ -24,17 +27,14 @@ RUN pnpm build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+# [填坑2] 运行阶段也极其需要 libc6-compat，防止 sharp 处理图片时引发 502 崩溃
+RUN apk add --no-cache libc6-compat
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
-
-# 注意：以下环境变量必须在运行时通过 docker-compose env_file 或 -e 参数注入：
-# - NEXTAUTH_SECRET (必需)
-# - NEXTAUTH_URL (必需)
-# - NEXTAUTH_TRUST_HOST=true (必需，用于 HTTPS)
-# - CASDOOR_CLIENT_ID
-# - CASDOOR_CLIENT_SECRET
-# - CASDOOR_ISSUER
+# [填坑3] 显式声明端口，确保 server.js 准确绑定
+ENV PORT=3000
 
 # 只从编译阶段拷贝必要的文件，减小体积
 COPY --from=builder /app/public ./public
