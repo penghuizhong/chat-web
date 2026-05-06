@@ -33,7 +33,7 @@ export default function Sidebar() {
 
     return (
         <aside
-            className={`relative flex flex-col h-screen bg-[#1c1c1c] text-zinc-300 border-r border-zinc-800 transition-all duration-300 ease-in-out z-50 ${isCollapsed ? "w-[72px]" : "w-64"
+            className={`hidden md:flex relative flex flex-col h-screen bg-[#1c1c1c] text-zinc-300 border-r border-zinc-800 transition-all duration-300 ease-in-out z-50 ${isCollapsed ? "w-[72px]" : "w-64"
                 }`}
         >
             {/* 顶部区域：Logo 与折叠按钮 */}

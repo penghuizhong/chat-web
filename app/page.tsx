@@ -14,7 +14,7 @@ export default function Home() {
           基于15年实战经验，为您提供工业级极简打版计算方案。
         </p>
 
-        <div className="flex flex-wrap justify-center gap-4 mt-8">
+        <div className="flex md:flex-row flex-wrap justify-center gap-4 mt-8">
           {['🧮 自动放量计算', '📏 领口结构推导', '📘 进阶实战课程'].map(item => (
             <Button key={item} variant="outline" className="rounded-full px-6 py-5 bg-background/50 hover:scale-105 transition-transform">
               {item}
