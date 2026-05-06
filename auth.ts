@@ -16,10 +16,10 @@ const config: NextAuthConfig = {
             clientSecret: process.env.CASDOOR_CLIENT_SECRET!,
             issuer: process.env.CASDOOR_ISSUER!,
 
-            // ✅ 内网加速：服务端请求全走内网
-            wellKnown: `${baseUrl}/.well-known/openid-configuration`,
-            token: `${baseUrl}/api/login/oauth/access_token`,
-            userinfo: `${baseUrl}/api/userinfo`,
+            // // ✅ 内网加速：服务端请求全走内网
+            // wellKnown: `${baseUrl}/.well-known/openid-configuration`,
+            // token: `${baseUrl}/api/login/oauth/access_token`,
+            // userinfo: `${baseUrl}/api/userinfo`,
 
             checks: ["pkce", "state"],
 
