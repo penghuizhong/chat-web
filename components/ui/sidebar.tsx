@@ -33,7 +33,7 @@ export default function Sidebar() {
 
     return (
         <aside
-            className={`hidden md:flex relative flex flex-col h-screen bg-[#1c1c1c] text-zinc-300 border-r border-zinc-800 transition-all duration-300 ease-in-out z-50 ${isCollapsed ? "w-[72px]" : "w-64"
+            className={`hidden md:flex relative flex flex-col h-screen bg-background text-zinc-300 border-r border-zinc-800 transition-all duration-300 ease-in-out z-50 ${isCollapsed ? "w-[72px]" : "w-64"
                 }`}
         >
             {/* 顶部区域：Logo 与折叠按钮 */}
@@ -55,7 +55,7 @@ export default function Sidebar() {
             {/* 新建按钮 */}
             <div className="px-3 mb-4">
                 <button
-                    className={`flex items-center justify-center w-full gap-2 p-2.5 rounded-md bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 text-white transition-colors ${isCollapsed ? "px-0" : "px-3"
+                    className={`flex items-center justify-center w-full gap-2 p-2.5 rounded-md bg-background hover:bg-zinc-800 border border-zinc-700/50 text-white transition-colors ${isCollapsed ? "px-0" : "px-3"
                         }`}
                 >
                     <Plus size={18} />
