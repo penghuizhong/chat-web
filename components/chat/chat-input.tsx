@@ -36,7 +36,7 @@ export function ChatInput({ value, onChange, onSend, isStreaming, onStop }: Chat
         <div className="relative w-full max-w-3xl mx-auto drop-shadow-xl">
             {/* 悬浮菜单 */}
             {showMenu && (
-                <div ref={menuRef} className="absolute bottom-full left-0 mb-3 w-[260px] bg-popover rounded-[1.5rem] p-2 shadow-2xl border border-border z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <div ref={menuRef} className="absolute bottom-full left-0 mb-3 w-[calc(100vw-2rem)] sm:w-[260px] bg-popover rounded-[1.5rem] p-2 shadow-2xl border border-border z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
                     <div className="flex flex-col">
                         {/* ⚠️ 注意：所有不负责提交的按钮，必须明确加上 type="button"，防止误触发表单提交 */}
                         <button type="button" className="flex items-center gap-3 px-3 py-3 hover:bg-muted rounded-xl transition-colors text-left group">

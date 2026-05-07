@@ -174,3 +174,19 @@
 .prose td {
   @apply px-4 py-2.5 border-r border-border last:border-r-0;
 }
+
+/* dvh 回退：不支持 100dvh 的浏览器回退到 100vh */
+@supports not (height: 100dvh) {
+  .h-dvh {
+    height: 100vh;
+  }
+}
+
+/* 安全区底部内边距（iPhone X+） */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom);
+}

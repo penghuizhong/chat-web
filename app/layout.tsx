@@ -1,6 +1,7 @@
 // app/layout.tsx
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import type { Viewport } from 'next';
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Sidebar from "@/components/ui/sidebar";
@@ -11,9 +12,13 @@ import { AuthModal } from "@/components/auth/auth-modal";
 import { auth } from "@/auth";
 
 import { Toaster } from "sonner";
-// import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-// import { Button } from "@/components/ui/button";
-// import { Menu } from "lucide-react";
+
+// 👉 移动端视口配置：支持刘海屏安全区域
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
+};
 
 // 👉 新增：将 RootLayout 变为 async 函数
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -22,7 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
     return (
         <html lang="zh-CN" suppressHydrationWarning>
-            <body suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable} antialiased flex h-screen overflow-hidden`}>
+            <body suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable} antialiased flex h-dvh overflow-hidden`}>
                 {/* 👉 新增：将拿到的 session 喂给前端的 AuthProvider，消除前端水瀑布请求 */}
                 <AuthProvider session={session}>
                     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
@@ -33,7 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
                             <Header />
 
-                            <main className="flex-1 overflow-y-auto pt-4 md:pt-24 pb-32">
+                            <main className="flex-1 overflow-y-auto pt-20 md:pt-24 pb-32">
                                 {children}
                             </main>
 

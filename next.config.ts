@@ -3,11 +3,15 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
 
+
+
 const nextConfig: NextConfig = {
   output: "standalone",
   // experimental: {
   //   serverComponentsExternalPackages: [],
   // },
+  allowedDevOrigins: ['172.20.10.9'],
+
   async rewrites() {
 
     if (!isDev) {

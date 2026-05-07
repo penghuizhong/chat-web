@@ -34,7 +34,7 @@ export default function Sidebar() {
     };
 
     // 👉 3. 拦截渲染：如果当前是需要隐藏侧边栏的页面，直接返回 null
-    const hideSidebarRoutes = ['/courses', '/tools'];
+    const hideSidebarRoutes = ['/courses', '/tools', '/docs'];
     const shouldHide = hideSidebarRoutes.some(route => pathname?.startsWith(route));
     if (shouldHide) {
         return null; // 彻底不渲染，不占空间
@@ -74,9 +74,8 @@ export default function Sidebar() {
 
             {/* 中部导航菜单 */}
             <nav className="flex-1 overflow-y-auto px-3 space-y-1 scrollbar-hide">
-                <NavItem icon={<Monitor size={18} />} label="工作台" isCollapsed={isCollapsed} />
-                <NavItem icon={<Folder size={18} />} label="我的空间" isCollapsed={isCollapsed} />
-                <NavItem icon={<Settings size={18} />} label="自定义" isCollapsed={isCollapsed} />
+                <NavItem icon={<Monitor size={18} />} label="工具" isCollapsed={isCollapsed} />
+                <NavItem icon={<Folder size={18} />} label="课程" isCollapsed={isCollapsed} />
                 <div className="pt-4 pb-2">
                     {!isCollapsed && <p className="text-xs font-medium text-zinc-500 px-2 mb-1">历史</p>}
                     <NavItem icon={<History size={18} />} label="历史记录" isCollapsed={isCollapsed} />
