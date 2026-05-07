@@ -7,12 +7,13 @@ import Sidebar from "@/components/ui/sidebar";
 import { Header } from "@/components/layout/header";
 import { GlobalChatShell } from "@/components/chat/global-chat-shell";
 import { AuthProvider } from "@/lib/auth"
-import { AuthModal } from "@/components/auth/auth-modal"
+import { AuthModal } from "@/components/auth/auth-modal";
+import { auth } from "@/auth";
+
 import { Toaster } from "sonner";
-import { auth } from "@/auth"; // 👉 新增：从根目录的 auth.ts 引入服务端 auth 方法
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+// import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+// import { Button } from "@/components/ui/button";
+// import { Menu } from "lucide-react";
 
 // 👉 新增：将 RootLayout 变为 async 函数
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -35,7 +36,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                             <main className="flex-1 overflow-y-auto pt-4 md:pt-24 pb-32">
                                 {children}
                             </main>
+
                             <AuthModal />
+
                             <Toaster position="top-right" richColors />
                             <GlobalChatShell />
                         </div>
